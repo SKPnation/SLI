@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Skiplab Innovation</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="sign_out">Sign out</string>
+    <string name="settings">Account Settings</string>
+    <string name="dbnode_users">users</string>
+    <string name="field_name">name</string>
+    <string name="field_phone">phone</string>
+    <string name="field_user_id">user_id</string>
+    <string name="dialog_change_photo">ChangePhotoDialog</string>
+    <string name="field_profile_image">profile_image</string>
+    <string name="title_activity_chat">ChatActivity</string>
+</resources>
