@@ -31,6 +31,7 @@
         android:layout_marginTop="60dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:src="@drawable/sk_p_cropped"
             android:id="@+id/profile_image"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"

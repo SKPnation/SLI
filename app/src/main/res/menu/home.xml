@@ -14,7 +14,7 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/chat"
+        android:id="@+id/option_chat"
         android:orderInCategory="100"
         android:title="Chat"
         app:showAsAction="never" />

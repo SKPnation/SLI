@@ -162,7 +162,9 @@ public class HomeActivity extends AppCompatActivity {
         if(item.getItemId() == R.id.action_settings){
             startActivity( new Intent( this, SettingsActivity.class ) );
         }
-
+        if (item.getItemId() == R.id.option_chat){
+            startActivity( new Intent( this, ChatActivity.class ) );
+        }
         return true;
     }
 }

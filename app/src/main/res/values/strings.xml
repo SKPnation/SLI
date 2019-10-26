@@ -10,4 +10,11 @@
     <string name="dialog_change_photo">ChangePhotoDialog</string>
     <string name="field_profile_image">profile_image</string>
     <string name="title_activity_chat">ChatActivity</string>
+    <string name="dialog_new_chatroom">NewChatroomDialog</string>
+    <string name="dbnode_chatrooms">chatrooms</string>
+    <string name="field_chatroom_messages">chatroom_messages</string>
+    <string name="field_users">users</string>
+    <string name="field_chatroom_id">chatroom_id</string>
+    <string name="intent_chatroom">intent_chatroom</string>
+    <string name="field_last_message_seen">last_message_seen</string>
 </resources>

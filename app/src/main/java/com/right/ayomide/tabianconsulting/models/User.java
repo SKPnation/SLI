@@ -1,16 +1,15 @@
 package com.right.ayomide.tabianconsulting.models;
 
 public class User {
-    private String name, phone, profile_image, security_level, user_id;
+    private String name, phone, profile_image, user_id;
 
     public User() {
     }
 
-    public User(String name, String phone, String profile_image, String security_level, String user_id) {
+    public User(String name, String phone, String profile_image, String user_id) {
         this.name = name;
         this.phone = phone;
         this.profile_image = profile_image;
-        this.security_level = security_level;
         this.user_id = user_id;
     }
 
@@ -36,14 +35,6 @@ public class User {
 
     public void setProfile_image(String profile_image) {
         this.profile_image = profile_image;
-    }
-
-    public String getSecurity_level() {
-        return security_level;
-    }
-
-    public void setSecurity_level(String security_level) {
-        this.security_level = security_level;
     }
 
     public String getUser_id() {

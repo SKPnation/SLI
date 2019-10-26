@@ -264,7 +264,11 @@ public class SettingsActivity extends AppCompatActivity {
 
                     etName.setText( user.getName() );
                     etPhone.setText( user.getPhone() );
-                    Picasso.with( getBaseContext() ).load(user.getProfile_image()).into( mProfileImage );
+                    if (!user.getProfile_image().equals( "" )){
+                        Picasso.with( getBaseContext() ).load(user.getProfile_image()).into( mProfileImage );
+                    } else {
+                        Toast.makeText( SettingsActivity.this, "Please set a profile picture", Toast.LENGTH_SHORT ).show();
+                    }
                 }
             }
 
@@ -293,7 +297,12 @@ public class SettingsActivity extends AppCompatActivity {
 
                     etName.setText( user.getName() );
                     etPhone.setText( user.getPhone() );
-                    Picasso.with( getBaseContext() ).load(user.getProfile_image()).into( mProfileImage );
+                    if (!user.getProfile_image().equals( "" )){
+                        Picasso.with( getBaseContext() ).load(user.getProfile_image()).into( mProfileImage );
+                    } else {
+                        mProfileImage.setImageResource( R.drawable.skiplab_default_profile_photo );
+                    }
+
                 }
             }
 
@@ -305,7 +314,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         /*
             ---------- Query method 3 --------------
-         */
+
         Query query3 = reference.child( getString( R.string.dbnode_users ) )
                 .orderByValue()
                 .equalTo( FirebaseAuth.getInstance().getCurrentUser().getUid() );
@@ -322,6 +331,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                     etName.setText( user.getName() );
                     etPhone.setText( user.getPhone() );
+                    Picasso.with( getBaseContext() ).load(user.getProfile_image()).into( mProfileImage );
                 }
             }
 
@@ -330,6 +340,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             }
         } );
+        */
 
         etEmail.setText( FirebaseAuth.getInstance().getCurrentUser().getEmail() );
     }
