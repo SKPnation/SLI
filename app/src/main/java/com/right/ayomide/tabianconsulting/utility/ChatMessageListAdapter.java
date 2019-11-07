@@ -57,7 +57,8 @@ public class ChatMessageListAdapter extends ArrayAdapter<ChatMessage> {
 
         final ViewHolder holder;
 
-        if(convertView == null){
+        if(convertView == null)
+        {
             LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(mLayoutResource, parent, false);
             holder = new ViewHolder();
