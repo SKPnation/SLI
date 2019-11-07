@@ -51,4 +51,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     //Firebase Cloud Messaging
     implementation 'com.google.firebase:firebase-messaging:17.0.0'
+    //Firebase recylerView
+    implementation 'com.firebaseui:firebase-ui-database:1.2.0'
+
 }

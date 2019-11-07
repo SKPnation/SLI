@@ -49,6 +49,7 @@ public class ChatroomListAdapter extends ArrayAdapter<Chatroom> {
     public static class ViewHolder{
         TextView name, creatorName, numberMessages;
         ImageView mProfileImage, mTrash;
+        Button leaveChat;
         RelativeLayout layoutContainer;
     }
 
@@ -67,6 +68,7 @@ public class ChatroomListAdapter extends ArrayAdapter<Chatroom> {
             holder.numberMessages = (TextView) convertView.findViewById(R.id.number_chatmessages);
             holder.mProfileImage = (ImageView) convertView.findViewById(R.id.profile_image);
             holder.mTrash = (ImageView) convertView.findViewById(R.id.icon_trash);
+            holder.leaveChat = (Button) convertView.findViewById(R.id.leave_chat);
             holder.layoutContainer = (RelativeLayout) convertView.findViewById(R.id.layout_container);
         }else{
             holder = (ViewHolder) convertView.getTag();
