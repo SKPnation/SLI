@@ -29,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.right.ayomide.tabianconsulting.Authentication;
+import com.right.ayomide.tabianconsulting.Common.Common;
 import com.right.ayomide.tabianconsulting.R;
 import com.right.ayomide.tabianconsulting.models.ChatMessage;
 import com.right.ayomide.tabianconsulting.models.Chatroom;
@@ -203,7 +204,13 @@ public class ChatroomActivity extends AppCompatActivity {
                     }
                 }
                 //query the users node to get the profile images and names
-                getUserDetails();
+                if (Common.isConnectedToTheInternet( getBaseContext() ))
+                {
+                    getUserDetails();
+                } else
+                    {
+                        Toast.makeText( ChatroomActivity.this, "Searching for network", Toast.LENGTH_SHORT ).show();
+                    }
                 mAdapter.notifyDataSetChanged(); //notify the adapter that the dataset has changed
                 mListView.setSelection(mAdapter.getCount() - 1); //scroll to the bottom of the list
                 //initMessagesList();
@@ -343,7 +350,13 @@ public class ChatroomActivity extends AppCompatActivity {
     ValueEventListener mValueEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            getChatroomMessages();
+            if (Common.isConnectedToTheInternet( getBaseContext() )){
+                getChatroomMessages();
+            }
+            else
+                {
+                    Toast.makeText( ChatroomActivity.this, "Searching for network", Toast.LENGTH_SHORT ).show();
+                }
 
             //get the number of messages currently in the chat and update the database
             int numMessages = (int) dataSnapshot.getChildrenCount();

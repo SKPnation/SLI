@@ -29,6 +29,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.right.ayomide.tabianconsulting.Common.Common;
 import com.right.ayomide.tabianconsulting.models.ChatMessage;
 import com.right.ayomide.tabianconsulting.models.Chatroom;
 import com.right.ayomide.tabianconsulting.models.User;
@@ -71,7 +72,14 @@ public class ChatActivity extends AppCompatActivity {
 
         mListView = findViewById( R.id.listView );
 
-        getChatrooms();
+        if (Common.isConnectedToTheInternet( getBaseContext() ))
+        {
+            getChatrooms();
+        }
+        else
+            {
+                Toast.makeText( ChatActivity.this, "Searching for network", Toast.LENGTH_SHORT ).show();
+            }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById( R.id.fab );
         fab.setOnClickListener( new View.OnClickListener() {

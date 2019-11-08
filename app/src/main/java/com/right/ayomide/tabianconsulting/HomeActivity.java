@@ -185,6 +185,9 @@ public class HomeActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.option_chat){
             startActivity( new Intent( this, ChatActivity.class ) );
         }
+        if (item.getItemId() == R.id.option_admin){
+            startActivity( new Intent( this, AdminActivity.class ) );
+        }
         return true;
     }
 }
