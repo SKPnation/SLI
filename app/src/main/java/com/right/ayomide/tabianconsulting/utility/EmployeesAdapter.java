@@ -4,21 +4,27 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.right.ayomide.tabianconsulting.AdminActivity;
+import com.right.ayomide.tabianconsulting.Common.Common;
+import com.right.ayomide.tabianconsulting.Interface.ItemClickListener;
 import com.right.ayomide.tabianconsulting.R;
 import com.right.ayomide.tabianconsulting.models.User;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.ViewHolder> {
+public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.ViewHolder>{
 
     private static final String TAG = "EmployeesAdapter";
 
@@ -55,7 +61,9 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.View
         return mUsers.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+
+
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
         public ImageView profileImage;
         public TextView name, department;
@@ -73,9 +81,10 @@ public class EmployeesAdapter extends RecyclerView.Adapter<EmployeesAdapter.View
                     Log.d(TAG, "onClick: selected employee: " + mUsers.get(getAdapterPosition()));
 
                     //open a dialog for selecting a department
-                    ((AdminActivity)mContext).setDepartmentDialog(mUsers.get(getAdapterPosition()));
+                    //((AdminActivity)mContext).setDepartmentDialog(mUsers.get(getAdapterPosition()));
                 }
             });
+
         }
     }
 }

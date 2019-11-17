@@ -37,8 +37,6 @@ public class NewDepartmentDialog extends DialogFragment {
                             .child(mNewDepartment.getText().toString())
                             .setValue(mNewDepartment.getText().toString());
                     getDialog().dismiss();
-
-                    ((AdminActivity)getActivity()).getDepartments();
                 }
             }
         });

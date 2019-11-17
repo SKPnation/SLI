@@ -2,6 +2,7 @@ package com.right.ayomide.tabianconsulting;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,14 +13,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,10 +45,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.right.ayomide.tabianconsulting.Common.Common;
 import com.right.ayomide.tabianconsulting.models.User;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -59,12 +67,13 @@ public class SettingsActivity extends AppCompatActivity {
     private StorageReference UserProfileImagesRef;
 
     private CircleImageView mProfileImage;
-    private EditText etName, etPhone, etEmail, etPassword;
+    private EditText etName, etPhone, etEmail, etPassword, etDepartment;
     private Button btnSave;
-    private TextView change_password;
+    private TextView select_department, change_password;
     private ProgressDialog mProgressDialog;
 
     //vars
+    private List<String> mDepartmentsList;
     private boolean mStoragePermissions;
     private Uri mSelectedImageUri;
     private Bitmap mSelectedImageBitmap;
@@ -87,10 +96,23 @@ public class SettingsActivity extends AppCompatActivity {
         etEmail = findViewById( R.id.etEmail );
         etPassword = findViewById( R.id.etPassword );
         btnSave = findViewById( R.id.btnSave );
+        select_department = findViewById( R.id.tvDepartment );
+        etDepartment = findViewById( R.id.etDepartment );
         change_password = findViewById( R.id.change_password );
 
+        mDepartmentsList = new ArrayList<>();
+
         verifyStoragePermissions();
-        getAccountsData();
+
+        if(Common.isConnectedToTheInternet(getBaseContext()))
+        {
+            getAccountsData();
+        }
+        else
+        {
+            Toast.makeText(getBaseContext(), "Please check your internet connection", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         btnSave.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -168,6 +190,73 @@ public class SettingsActivity extends AppCompatActivity {
                 }
             }
         } );
+
+        select_department.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "setDepartmentDialog: setting the department of: " + FirebaseAuth.getInstance().getCurrentUser().getEmail());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+                builder.setIcon(R.drawable.ic_departments);
+                builder.setTitle("Set a Department for " + FirebaseAuth.getInstance().getCurrentUser().getEmail());
+
+                builder.setPositiveButton("done", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child( getString( R.string.dbnode_departments ) );
+
+                reference.addListenerForSingleValueEvent( new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists())
+                        {
+                            mDepartmentsList.clear();
+                            for (DataSnapshot ds: dataSnapshot.getChildren())
+                            {
+                                String departmentName = ds.getValue(String.class);
+                                mDepartmentsList.add( departmentName );
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                } );
+
+                int index = -1;
+                for(int i = 0; i < mDepartmentsList.size(); i++){
+                    User user = new User();
+                    if(mDepartmentsList.contains(user.getDepartment())){
+                        index = i;
+                    }
+                }
+
+                final ListAdapter adapter = new ArrayAdapter<String>(SettingsActivity.this,
+                        android.R.layout.simple_list_item_1, mDepartmentsList);
+                builder.setSingleChoiceItems(adapter, index, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+                        reference.child(getString(R.string.dbnode_users))
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                .child(getString(R.string.field_department))
+                                .setValue(mDepartmentsList.get(which));
+                        dialog.dismiss();
+                        Toast.makeText(SettingsActivity.this, "Department Saved", Toast.LENGTH_SHORT).show();
+                        getAccountsData();
+                    }
+                });
+
+                builder.show();
+            }
+        } );
     }
 
     private void ToAccessPhotoGallery()
@@ -242,6 +331,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void getAccountsData()
     {
+        mProgressDialog = new ProgressDialog( SettingsActivity.this );
+        mProgressDialog.setMessage( "Retrieving data..." );
+        mProgressDialog.show();
+
         Log.d( TAG, "getUserAccountsData: getting the user's account information" );
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
@@ -262,12 +355,17 @@ public class SettingsActivity extends AppCompatActivity {
                     User user = singleSnapshot.getValue(User.class);
                     Log.d( TAG, "onDataChange: (QUERY METHOD 1) found user: " + user.toString());
 
+                    mProgressDialog.dismiss();
+
                     etName.setText( user.getName() );
                     etPhone.setText( user.getPhone() );
+                    etDepartment.setText( user.getDepartment() );
                     if (!user.getProfile_image().equals( "" )){
                         Picasso.with( getBaseContext() ).load(user.getProfile_image()).into( mProfileImage );
+                        mProgressDialog.dismiss();
                     } else {
                         Toast.makeText( SettingsActivity.this, "Please set a profile picture", Toast.LENGTH_SHORT ).show();
+                        mProgressDialog.dismiss();
                     }
                 }
             }
@@ -295,12 +393,17 @@ public class SettingsActivity extends AppCompatActivity {
                     User user = singleSnapshot.getValue(User.class);
                     Log.d( TAG, "onDataChange: (QUERY METHOD 2) found user: " + user.toString());
 
+                    mProgressDialog.dismiss();
+
                     etName.setText( user.getName() );
                     etPhone.setText( user.getPhone() );
+                    etDepartment.setText( user.getDepartment() );
                     if (!user.getProfile_image().equals( "" )){
                         Picasso.with( getBaseContext() ).load(user.getProfile_image()).into( mProfileImage );
+                        mProgressDialog.dismiss();
                     } else {
                         mProfileImage.setImageResource( R.drawable.skiplab_default_profile_photo );
+                        mProgressDialog.dismiss();
                     }
 
                 }

@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.right.ayomide.tabianconsulting.models.User;
@@ -112,9 +113,10 @@ public class RegisterActivity extends AppCompatActivity {
         mProgressDialog.setMessage( "Loading..." );
         mProgressDialog.show();
 
-        FirebaseAuth.getInstance().createUserWithEmailAndPassword( email, password ).addOnCompleteListener( new OnCompleteListener<AuthResult>() {
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword( email, password ).addOnCompleteListener(
+                RegisterActivity.this, new OnCompleteListener<AuthResult>() {
             @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
+            public void onComplete(@NonNull final Task<AuthResult> task) {
                 Log.d( TAG, "onComplete: onComplete: " + task.isSuccessful());
 
                 if (task.isSuccessful())
@@ -146,7 +148,8 @@ public class RegisterActivity extends AppCompatActivity {
                         public void onFailure(@NonNull Exception e) {
                             FirebaseAuth.getInstance().signOut();
                             startActivity( new Intent( RegisterActivity.this, Authentication.class ) );
-                            Toast.makeText( RegisterActivity.this, "Something went wrong", Toast.LENGTH_SHORT ).show();
+                            task.getException().getMessage();
+                            //Toast.makeText( RegisterActivity.this, "Something went wrong", Toast.LENGTH_SHORT ).show();
                         }
                     } );
 
@@ -158,6 +161,7 @@ public class RegisterActivity extends AppCompatActivity {
             }
         } );
     }
+
 
 /*
     private boolean isValidDomain(String email)

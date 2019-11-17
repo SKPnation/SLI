@@ -24,4 +24,7 @@ public class Common {
         }
         return false;
     }
+
+
+    public static final String DELETE = "Delete";
 }
