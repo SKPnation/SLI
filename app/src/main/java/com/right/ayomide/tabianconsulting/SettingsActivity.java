@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -22,7 +20,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,6 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
     private Uri mSelectedImageUri;
     private Bitmap mSelectedImageBitmap;
     private byte[] mBytes;
+    boolean clicked=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -239,6 +237,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                 final ListAdapter adapter = new ArrayAdapter<String>(SettingsActivity.this,
                         android.R.layout.simple_list_item_1, mDepartmentsList);
+
                 builder.setSingleChoiceItems(adapter, index, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -618,4 +617,5 @@ public class SettingsActivity extends AppCompatActivity {
                 break;
         }
     }
+
 }
