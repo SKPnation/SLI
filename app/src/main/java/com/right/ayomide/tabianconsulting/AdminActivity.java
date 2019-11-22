@@ -1,6 +1,7 @@
 package com.right.ayomide.tabianconsulting;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,35 +17,44 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.right.ayomide.tabianconsulting.Common.Common;
 import com.right.ayomide.tabianconsulting.Interface.ItemClickListener;
 import com.right.ayomide.tabianconsulting.models.User;
 import com.right.ayomide.tabianconsulting.utility.EmployeeViewHolder;
 import com.right.ayomide.tabianconsulting.utility.EmployeesAdapter;
+import com.right.ayomide.tabianconsulting.utility.FCM;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.text.TextUtils.isEmpty;
 
 public class AdminActivity extends AppCompatActivity {
 
     private static final String TAG = "AdminActivity";
+    private static final String BASE_URL = "https://fcm.googleapis.com/fcm/";
 
     private ProgressDialog mProgressDialog;
 
     //widgets
     private TextView mDepartments;
     private Button mAddDepartment, mSendMessage;
-    private RecyclerView mRecyclerView;
     private EditText mMessage, mTitle;
 
     //vars
-    private List<String> mDepartmentsList;
+    private ArrayList<String> mDepartmentsList;
     private Set<String> mSelectedDepartments;
     private EmployeesAdapter mEmployeeAdapter;
     private ArrayList<User> mUsers;
@@ -55,9 +65,9 @@ public class AdminActivity extends AppCompatActivity {
     FirebaseDatabase db;
     DatabaseReference User;
 
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    FirebaseRecyclerAdapter<User, EmployeeViewHolder> adapter;
+    private RecyclerView recyclerView;
+    private RecyclerView.LayoutManager layoutManager;
+    private FirebaseRecyclerAdapter<User, EmployeeViewHolder> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +125,7 @@ public class AdminActivity extends AppCompatActivity {
                 viewHolder.name.setText( model.getName() );
                 if (model.getProfile_image().isEmpty())
                 {
-                    viewHolder.profileImage.setImageDrawable( ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_android));
+                    viewHolder.profileImage.setImageDrawable( ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_no_image));
                 }
                 else
                     {
@@ -139,6 +149,9 @@ public class AdminActivity extends AppCompatActivity {
 
     private void init()
     {
+        mSelectedDepartments = new HashSet<>();
+        mTokens = new HashSet<>();
+
         mAddDepartment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,6 +161,9 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+         /*
+            --------- Dialog for selecting departments ---------
+         */
         mDepartments.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,7 +173,49 @@ public class AdminActivity extends AppCompatActivity {
                 builder.setIcon(R.drawable.ic_departments);
                 builder.setTitle("Select Departments:");
 
-                builder.show();
+                //create an array of the departments
+                String[] departments = new String[mDepartmentsList.size()];
+                for(int i = 0; i < mDepartmentsList.size(); i++){
+                    departments[i] = mDepartmentsList.get(i);
+                }
+
+                boolean[] checked = new boolean[mDepartmentsList.size()];
+                for(int i = 0; i < mDepartmentsList.size(); i++){
+                    if(mSelectedDepartments.contains(mDepartmentsList.get(i))){
+                        checked[i] = true;
+                    }
+                }
+
+                builder.setPositiveButton( "done", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                } );
+
+                builder.setMultiChoiceItems(departments, checked,  new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int position, boolean isChecked) {
+                        if(isChecked){
+                            Log.d(TAG, "onClick: adding " + mDepartmentsList.get(position) + " to the list.");
+                            mSelectedDepartments.add(mDepartmentsList.get(position));
+                        }else{
+                            Log.d(TAG, "onClick: removing " + mDepartmentsList.get(position) + " from the list.");
+                            mSelectedDepartments.remove(mDepartmentsList.get(position));
+                        }
+                    }
+                });
+
+                AlertDialog dialogInterface = builder.create();
+                dialogInterface.show();
+
+                dialogInterface.setOnDismissListener( new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        Log.d(TAG, "onDismiss: dismissing dialog and refreshing token list.");
+                        getDepartmentTokens();
+                    }
+                } );
             }
         } );
 
@@ -179,19 +237,108 @@ public class AdminActivity extends AppCompatActivity {
                 }
             }
         } );
+
+        getDepartments();
+        getServerKey();
+    }
+
+    /**
+     * Retrieves the server key for the Firebase server.
+     * This is required to send FCM messages.
+     */
+    private void getServerKey()
+    {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+        Query query = reference.child(getString(R.string.dbnode_server))
+                .orderByValue();
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: got the server key.");
+                DataSnapshot singleSnapshot = dataSnapshot.getChildren().iterator().next();
+                mServerKey = singleSnapshot.getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void sendMessageToDepartment(String title, String message)
     {
-        //...
+        Log.d(TAG, "sendMessageToDepartment: sending message to selected departments.");
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl( BASE_URL )
+                .addConverterFactory( GsonConverterFactory.create() )
+                .build();
+
+        FCM fcmAPI = retrofit.create( FCM.class );
     }
 
 
     /**
      * Get all the tokens of the users who are in the selected departments
      */
-    //private void getDepartmentTokens() {}
+    private void getDepartmentTokens()
+    {
+        Log.d(TAG, "getDepartmentTokens: searching for tokens.");
+        //mTokens.clear(); //clear current token list in case admin has change departments
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
+        for(String department: mSelectedDepartments){
+            Log.d(TAG, "getDepartmentTokens: department: " + department);
+
+            Query query = reference.child(getString(R.string.dbnode_users))
+                    .orderByChild(getString(R.string.field_department))
+                    .equalTo(department);
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                        String token = snapshot.getValue(User.class).getMessaging_token();
+                        Log.d(TAG, "onDataChange: got a token for user named: "
+                                + snapshot.getValue(User.class).getName());
+                        mTokens.add(token);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    /**
+     * Retrieve a list of departments that have been added to the database.
+     */
+    public void getDepartments(){
+        mDepartmentsList = new ArrayList<>();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+        Query query = reference.child(getString(R.string.dbnode_departments));
+
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                    String department = snapshot.getValue().toString();
+                    Log.d(TAG, "onDataChange: found a department: " + department);
+                    mDepartmentsList.add(department);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 
     @Override
     public void onStart() {

@@ -1,15 +1,20 @@
 package com.right.ayomide.tabianconsulting.utility;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,7 +27,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.right.ayomide.tabianconsulting.ChatActivity;
 import com.right.ayomide.tabianconsulting.R;
 import com.right.ayomide.tabianconsulting.models.Chatroom;
@@ -59,7 +63,8 @@ public class ChatroomListAdapter extends ArrayAdapter<Chatroom> {
 
         final ViewHolder holder;
 
-        if(convertView == null){
+        if(convertView == null)
+        {
             convertView = mInflater.inflate(mLayoutResource, parent, false);
             holder = new ViewHolder();
 
@@ -74,12 +79,12 @@ public class ChatroomListAdapter extends ArrayAdapter<Chatroom> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        try{
+        try {
             //set the chatroom name
             holder.name.setText(getItem(position).getChatroom_name());
 
             //set the number of chat messages
-            String chatMessagesString = String.valueOf(getItem(position).getChatroom_messages().size())
+            final String chatMessagesString = String.valueOf(getItem(position).getChatroom_messages().size())
                     + " messages";
             holder.numberMessages.setText(chatMessagesString);
 
@@ -96,7 +101,14 @@ public class ChatroomListAdapter extends ArrayAdapter<Chatroom> {
                                 + singleSnapshot.getValue(User.class).getName());
                         String createdBy = "created by " + singleSnapshot.getValue(User.class).getName();
                         holder.creatorName.setText(createdBy);
-                        Picasso.with( getContext() ).load( singleSnapshot.getValue(User.class).getProfile_image() ).into( holder.mProfileImage );
+                        if (singleSnapshot.getValue(User.class).getProfile_image().isEmpty())
+                        {
+                            holder.mProfileImage.setImageDrawable( ContextCompat.getDrawable(mContext, R.drawable.ic_no_image));
+                        }
+                        else
+                            {
+                                Picasso.with( getContext() ).load( singleSnapshot.getValue(User.class).getProfile_image() ).into( holder.mProfileImage );
+                            }
                     }
                 }
 
@@ -123,7 +135,45 @@ public class ChatroomListAdapter extends ArrayAdapter<Chatroom> {
                 @Override
                 public void onClick(View view) {
                     Log.d(TAG, "onClick: navigating to chatroom");
-                    ((ChatActivity)mContext).joinChatroom(getItem(position));
+
+                    AlertDialog.Builder builder= new AlertDialog.Builder(mContext, R.style.AlertDialog);
+                    builder.setTitle("Enter Chatroom Code :");
+
+                    final EditText chatroomCode = new EditText(mContext);
+
+                    chatroomCode.setHint("\t\t\t\t e.g 0000 ");
+                    builder.setView(chatroomCode);
+
+                    builder.setPositiveButton( "ENTER", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            final String code = chatroomCode.getText().toString();
+
+                            if(TextUtils.isEmpty(code))
+                            {
+                                Toast.makeText( mContext, "Please Enter Code", Toast.LENGTH_SHORT).show();
+                            }
+                            else
+                            {
+                                enterChatroom(code);
+                            }
+                        }
+                    } );
+
+                    builder.show();
+                }
+
+                private void enterChatroom(String code)
+                {
+                    if (code.equals( getItem( position ).getChatroom_code() ))
+                    {
+                        Log.d( TAG, "onClick: Welcome to " + getItem( position ).getChatroom_name() );
+                        ((ChatActivity)mContext).joinChatroom(getItem(position));
+                    }
+                    else
+                    {
+                        Toast.makeText( mContext, "Wrong Code!!!", Toast.LENGTH_LONG ).show();
+                    }
                 }
             } );
 
@@ -133,4 +183,6 @@ public class ChatroomListAdapter extends ArrayAdapter<Chatroom> {
 
         return convertView;
     }
+
+
 }

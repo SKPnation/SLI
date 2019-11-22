@@ -6,6 +6,7 @@
     <string name="dbnode_users">users</string>
     <string name="dbnode_chatrooms">chatrooms</string>
     <string name="dbnode_departments">departments</string>
+    <string name="dbnode_server">server</string>
     <string name="field_name">name</string>
     <string name="field_phone">phone</string>
     <string name="field_department">department</string>

@@ -30,6 +30,28 @@
             android:textSize="15sp"
             android:id="@+id/input_chatroom_name"/>
 
+        <TextView
+            android:layout_below="@id/input_chatroom_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="New Chatroom Code:"
+            android:textSize="16sp"
+            android:textColor="#000"
+            android:id="@+id/textChatroomCode"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@null"
+            android:layout_below="@+id/textChatroomCode"
+            android:layout_marginTop="10dp"
+            android:hint="Put in chatroom code here"
+            android:textSize="15sp"
+            android:id="@+id/input_chatroom_code"/>
+
     </RelativeLayout>
 
 </RelativeLayout>

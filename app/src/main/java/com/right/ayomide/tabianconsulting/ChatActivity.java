@@ -10,6 +10,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +52,7 @@ public class ChatActivity extends AppCompatActivity {
     private ListView mListView;
 
     //Create new chatroom layout
-    private EditText mChatroomName;
+    private EditText mChatroomName, mChatroomCode;
 
     //vars
     private ArrayList<Chatroom> mChatrooms;
@@ -97,7 +98,8 @@ public class ChatActivity extends AppCompatActivity {
         View dialog_new_chatroom = inflater.inflate( R.layout.dialog_new_chatroom, null );
         builder.setView( dialog_new_chatroom );
 
-        mChatroomName = (EditText) dialog_new_chatroom.findViewById(R.id.input_chatroom_name);
+        mChatroomName = dialog_new_chatroom.findViewById(R.id.input_chatroom_name);
+        mChatroomCode = dialog_new_chatroom.findViewById( R.id.input_chatroom_code );
 
         builder.setPositiveButton( "Create", new DialogInterface.OnClickListener() {
             @Override
@@ -119,6 +121,7 @@ public class ChatActivity extends AppCompatActivity {
                     //create the chatroom
                     Chatroom chatroom = new Chatroom();
                     chatroom.setChatroom_name(mChatroomName.getText().toString());
+                    chatroom.setChatroom_code( mChatroomCode.getText().toString() );
                     chatroom.setCreator_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
                     chatroom.setChatroom_id(chatroomId);
 
@@ -201,6 +204,7 @@ public class ChatActivity extends AppCompatActivity {
 
                     chatroom.setChatroom_id( objectMap.get( "chatroom_id" ).toString() );
                     chatroom.setChatroom_name( objectMap.get( "chatroom_name" ).toString() );
+                    chatroom.setChatroom_code( objectMap.get( "chatroom_code" ).toString() );
                     chatroom.setCreator_id( objectMap.get( "creator_id" ).toString() );
 
                     //chatroom.setChatroom_id(singleSnapshot.getValue(Chatroom.class).getChatroom_id());
@@ -324,6 +328,8 @@ public class ChatActivity extends AppCompatActivity {
                         Intent intent = new Intent(ChatActivity.this, ChatroomActivity.class);
                         intent.putExtra(getString(R.string.intent_chatroom), chatroom);
                         startActivity(intent);
+
+
                     }
                 }
                 //getChatrooms();

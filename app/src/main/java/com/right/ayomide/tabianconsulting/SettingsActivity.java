@@ -228,7 +228,8 @@ public class SettingsActivity extends AppCompatActivity {
                 } );
 
                 int index = -1;
-                for(int i = 0; i < mDepartmentsList.size(); i++){
+                for(int i = 0; i < mDepartmentsList.size(); i++)
+                {
                     User user = new User();
                     if(mDepartmentsList.contains(user.getDepartment())){
                         index = i;

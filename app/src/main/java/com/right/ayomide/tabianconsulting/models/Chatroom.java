@@ -8,6 +8,7 @@ import java.util.List;
 public class Chatroom implements Parcelable {
 
     private String chatroom_name;
+    private String chatroom_code;
     private String creator_id;
     private String chatroom_id;
     private List<ChatMessage> chatroom_messages;
@@ -16,8 +17,9 @@ public class Chatroom implements Parcelable {
     public Chatroom() {
     }
 
-    public Chatroom(String chatroom_name, String creator_id, String chatroom_id, List<ChatMessage> chatroom_messages, List<String> users) {
+    public Chatroom(String chatroom_name, String chatroom_code, String creator_id, String chatroom_id, List<ChatMessage> chatroom_messages, List<String> users) {
         this.chatroom_name = chatroom_name;
+        this.chatroom_code = chatroom_code;
         this.creator_id = creator_id;
         this.chatroom_id = chatroom_id;
         this.chatroom_messages = chatroom_messages;
@@ -30,6 +32,14 @@ public class Chatroom implements Parcelable {
 
     public void setChatroom_name(String chatroom_name) {
         this.chatroom_name = chatroom_name;
+    }
+
+    public String getChatroom_code() {
+        return chatroom_code;
+    }
+
+    public void setChatroom_code(String chatroom_code) {
+        this.chatroom_code = chatroom_code;
     }
 
     public String getCreator_id() {
@@ -70,6 +80,7 @@ public class Chatroom implements Parcelable {
 
     protected Chatroom(Parcel in) {
         chatroom_name = in.readString();
+        chatroom_code = in.readString();
         creator_id = in.readString();
         chatroom_id = in.readString();
     }
@@ -77,6 +88,7 @@ public class Chatroom implements Parcelable {
     @Override
     public void writeToParcel(Parcel parcel, int flags) {
         parcel.writeString(chatroom_name);
+        parcel.writeString( chatroom_code );
         parcel.writeString(creator_id);
         parcel.writeString(chatroom_id);
     }

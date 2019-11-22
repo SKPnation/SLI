@@ -64,12 +64,14 @@ public class User {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "User{" +
-                "name ='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
-                ", profile_image='" + profile_image +'\'' +
+                ", profile_image='" + profile_image + '\'' +
+                ", user_id='" + user_id + '\'' +
+                ", messaging_token='" + messaging_token + '\'' +
+                ", department='" + department + '\'' +
                 '}';
     }
-
 }

@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/app_bar_layout"
         android:textSize="25sp"
-        android:text="@string/employee_dashboard"
+        android:text="Student Dashboard"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
         android:textColor="#000"
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/icon_scheduling"
                 android:textSize="15sp"
-                android:text="@string/employee_schedule"
+                android:text="Student Schedule"
                 android:layout_marginLeft="10dp"
                 android:textColor="#000"
                 android:layout_centerVertical="true"/>
@@ -114,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/icon_culture"
                 android:textSize="15sp"
-                android:text="@string/company_culture"
+                android:text="School Culture"
                 android:layout_marginLeft="10dp"
                 android:textColor="#000"
                 android:layout_centerVertical="true"/>
