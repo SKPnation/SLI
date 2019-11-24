@@ -261,10 +261,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void ToAccessPhotoGallery()
     {
-        Intent galleryIntent = new Intent();
-        galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
-        startActivityForResult(galleryIntent, GalleryPick);
+        CropImage.activity()
+                .setGuidelines(CropImageView.Guidelines.ON)
+                .setAspectRatio(1, 1)
+                .start(this);
     }
 
     @Override
@@ -276,10 +276,7 @@ public class SettingsActivity extends AppCompatActivity {
         {
             Uri imageUri = data.getData();
 
-            CropImage.activity()
-                    .setGuidelines(CropImageView.Guidelines.ON)
-                    .setAspectRatio(1, 1)
-                    .start(this);
+            ToAccessPhotoGallery();
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -313,6 +310,7 @@ public class SettingsActivity extends AppCompatActivity {
                                         if (task.isSuccessful()) {
                                             Toast.makeText(SettingsActivity.this, "Profile image stored to firebase database successfully.", Toast.LENGTH_SHORT).show();
                                             mDialog.dismiss();
+                                            getAccountsData();
                                         } else {
                                             String message = task.getException().getMessage();
                                             Toast.makeText(SettingsActivity.this, "Error Occurred..." + message, Toast.LENGTH_SHORT).show();

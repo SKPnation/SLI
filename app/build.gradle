@@ -53,5 +53,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:17.0.0'
     //Firebase recylerView
     implementation 'com.firebaseui:firebase-ui-database:1.2.0'
+    //Retrofit library
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    //Gson is the name of a java library for converting java objects to json objects
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
 }
