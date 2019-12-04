@@ -39,6 +39,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -69,13 +70,17 @@ public class SettingsActivity extends AppCompatActivity {
     private TextView select_department, change_password;
     private ProgressDialog mProgressDialog;
 
+    //firebase
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
     //vars
     private List<String> mDepartmentsList;
     private boolean mStoragePermissions;
     private Uri mSelectedImageUri;
     private Bitmap mSelectedImageBitmap;
     private byte[] mBytes;
-    boolean clicked=false;
+    boolean isChecked;
+    public static boolean isActivityRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,7 +247,6 @@ public class SettingsActivity extends AppCompatActivity {
                 builder.setSingleChoiceItems(adapter, index, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                         reference.child(getString(R.string.dbnode_users))
                                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -257,6 +261,8 @@ public class SettingsActivity extends AppCompatActivity {
                 builder.show();
             }
         } );
+
+        setupFirebaseAuth();
     }
 
     private void ToAccessPhotoGallery()
@@ -615,6 +621,53 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    /*
+            ----------------------------- Firebase setup ---------------------------------
+         */
+    private void setupFirebaseAuth(){
+        Log.d(TAG, "setupFirebaseAuth: started.");
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    //toastMessage("Successfully signed in with: " + user.getEmail());
+
+
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    Toast.makeText(SettingsActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(SettingsActivity.this, Authentication.class);
+                    startActivity(intent);
+                    finish();
+                }
+                // ...
+            }
+        };
+
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+        isActivityRunning = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            FirebaseAuth.getInstance().removeAuthStateListener( mAuthListener );
+        }
+        isActivityRunning = false;
     }
 
 }

@@ -15,6 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".HelpActivity"></activity>
+
         <service android:name=".utility.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
@@ -44,7 +46,7 @@
             android:label="@string/title_activity_chat"
             android:theme="@style/AppTheme" />
         <activity android:name=".ChatroomActivity" />
-        <activity android:name=".AdminActivity"></activity>
+        <activity android:name=".AdminActivity" />
     </application>
 
 </manifest>

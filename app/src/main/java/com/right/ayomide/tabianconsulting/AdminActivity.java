@@ -26,16 +26,23 @@ import com.google.firebase.database.ValueEventListener;
 import com.right.ayomide.tabianconsulting.Common.Common;
 import com.right.ayomide.tabianconsulting.Interface.ItemClickListener;
 import com.right.ayomide.tabianconsulting.models.User;
+import com.right.ayomide.tabianconsulting.models.fcm.Data;
+import com.right.ayomide.tabianconsulting.models.fcm.FirebaseCloudMessage;
 import com.right.ayomide.tabianconsulting.utility.EmployeeViewHolder;
 import com.right.ayomide.tabianconsulting.utility.EmployeesAdapter;
 import com.right.ayomide.tabianconsulting.utility.FCM;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -277,6 +284,40 @@ public class AdminActivity extends AppCompatActivity {
                 .build();
 
         FCM fcmAPI = retrofit.create( FCM.class );
+
+        //attach the headers
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put( "Content-Type", "application/json" );
+        headers.put( "Authorization", "key="+mServerKey);
+
+        //Send message to all tokens
+//        for (String token : mTokens){
+
+//            Log.d( TAG, "SendMessageToDepartment: sending to token: "+ token );
+            Data data = new Data();
+            data.setTitle( title );
+            data.setMessage( message );
+            data.setData_type( getString( R.string.data_type_admin_broadcast ) );
+            FirebaseCloudMessage firebaseCloudMessage = new FirebaseCloudMessage();
+            firebaseCloudMessage.setData(data);
+            //firebaseCloudMessage.setTo(token);
+            firebaseCloudMessage.setTo( "/topics/Computer_Science" );
+
+            Call<ResponseBody> call = fcmAPI.send( headers, firebaseCloudMessage );
+
+            call.enqueue( new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.d(TAG, "onResponse Server response: "+ response.toString() );
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.d( TAG, "onFailure: unable to send the message: " + t.getMessage() );
+                    Toast.makeText( AdminActivity.this, "Unable to send the message!!!", Toast.LENGTH_LONG ).show();
+                }
+            } );
+ //       }
     }
 
 
@@ -299,7 +340,7 @@ public class AdminActivity extends AppCompatActivity {
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                    for(DataSnapshot snapshot: dataSnapshot.getChildren()) {
                         String token = snapshot.getValue(User.class).getMessaging_token();
                         Log.d(TAG, "onDataChange: got a token for user named: "
                                 + snapshot.getValue(User.class).getName());

@@ -2,12 +2,12 @@ package com.right.ayomide.tabianconsulting.models.fcm;
 
 public class FirebaseCloudMessage {
     private String to;
-    private String data;
+    private Data data;
 
     public FirebaseCloudMessage() {
     }
 
-    public FirebaseCloudMessage(String to, String data) {
+    public FirebaseCloudMessage(String to, Data data) {
         this.to = to;
         this.data = data;
     }
@@ -20,11 +20,11 @@ public class FirebaseCloudMessage {
         this.to = to;
     }
 
-    public String getData() {
+    public Data getData() {
         return data;
     }
 
-    public void setData(String data) {
+    public void setData(Data data) {
         this.data = data;
     }
 
@@ -32,7 +32,7 @@ public class FirebaseCloudMessage {
     public String toString() {
         return "FirebaseCloudMessage{" +
                 "to='" + to + '\'' +
-                ", data='" + data + '\'' +
+                ", data=" + data +
                 '}';
     }
 }

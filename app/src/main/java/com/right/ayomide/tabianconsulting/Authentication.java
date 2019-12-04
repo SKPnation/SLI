@@ -38,6 +38,8 @@ public class Authentication extends AppCompatActivity {
     private TextView tvRegister, resendVerification;
     private ProgressDialog mProgressDialog;
 
+    public static boolean isActivityRunning;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -235,16 +237,18 @@ public class Authentication extends AppCompatActivity {
 
     //Everything you need to use the authStateListener Object
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
-        FirebaseAuth.getInstance().addAuthStateListener( mAuthListener );
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+        isActivityRunning = true;
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
-        if (mAuthListener != null)
-            FirebaseAuth.getInstance().removeAuthStateListener( mAuthListener );
+        if (mAuthListener != null) {
+            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+        }
+        isActivityRunning = false;
     }
-    //Everything you need to use the authStateListener Object
 }

@@ -26,4 +26,13 @@
     <string name="employee_schedule">Employee Schedule</string>
     <string name="this_week_s_initiatives">This week\'s initiatives</string>
     <string name="company_culture">Company Culture</string>
+
+    <!-- FCM Related String -->
+    <string name="default_notification_channel_name" translatable="true">com.right.ayomide.tabianconsulting.default_notification_channel_name</string>
+    <string name="data_type_admin_broadcast">data_type_admin_broadcast</string>
+    <string name="data_type_chat_message">data_type_chat_message</string>
+    <string name="data_title">title</string>
+    <string name="data_type">data_type</string>
+    <string name="data_message">message</string>
+
 </resources>

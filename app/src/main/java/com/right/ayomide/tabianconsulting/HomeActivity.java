@@ -16,9 +16,16 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.right.ayomide.tabianconsulting.models.User;
+import com.squareup.picasso.Picasso;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -26,6 +33,8 @@ public class HomeActivity extends AppCompatActivity {
 
     //Firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
+
+    public static boolean isActivityRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +47,45 @@ public class HomeActivity extends AppCompatActivity {
         setupFirebaseAuth();
         getUserDetails();
         initFCM();
+
         //setUserDetails();
     }
 
     private void initFCM(){
-        String token = FirebaseInstanceId.getInstance().getToken();
-        Log.d( TAG, "initFCM: token: " + token );
-        SendRegistrationToServer( token );
+        //String token = FirebaseInstanceId.getInstance().getToken();
+        //Log.d( TAG, "initFCM: token: " + token );
+        //SendRegistrationToServer( token );
+
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+        Query query = reference.child( getString( R.string.dbnode_users ) )
+                .orderByKey()
+                .equalTo( FirebaseAuth.getInstance().getCurrentUser().getUid() );
+
+        //orderByChild will look for the name of that field which would be user_id
+        //therefore now we are looking for the user id in the field instead of in the key using the .equalTo method
+
+        query.addListenerForSingleValueEvent( new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot singleSnapshot: dataSnapshot.getChildren() ){
+                    User user = singleSnapshot.getValue(User.class);
+                    //Log.d( TAG, "onDataChange: (QUERY METHOD 2) found user: " + user.toString());
+
+                    if (!user.getDepartment().equals( "" ))
+                    {
+                        Log.d( TAG, "onDataChange: user department: " + user.getDepartment());
+                        FirebaseMessaging.getInstance().subscribeToTopic( user.getDepartment() );
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        } );
+
     }
 
     private void SendRegistrationToServer(String token){
@@ -153,6 +194,21 @@ public class HomeActivity extends AppCompatActivity {
         };
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseAuth.getInstance().addAuthStateListener(mAuthListener);
+        isActivityRunning = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            FirebaseAuth.getInstance().removeAuthStateListener(mAuthListener);
+        }
+        isActivityRunning = false;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -34,6 +34,9 @@ public class RegisterActivity extends AppCompatActivity {
     private Button btnRegister;
     private ProgressDialog mProgressDialog;
 
+    //vars
+    public static boolean isActivityRunning;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate( savedInstanceState );
@@ -162,6 +165,19 @@ public class RegisterActivity extends AppCompatActivity {
         } );
     }
 
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        isActivityRunning = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        isActivityRunning = false;
+    }
 
 /*
     private boolean isValidDomain(String email)
