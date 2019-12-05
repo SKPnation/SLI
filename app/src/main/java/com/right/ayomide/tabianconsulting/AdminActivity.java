@@ -2,6 +2,7 @@ package com.right.ayomide.tabianconsulting;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -291,17 +292,17 @@ public class AdminActivity extends AppCompatActivity {
         headers.put( "Authorization", "key="+mServerKey);
 
         //Send message to all tokens
-//        for (String token : mTokens){
+        for (String token : mTokens){
 
-//            Log.d( TAG, "SendMessageToDepartment: sending to token: "+ token );
+            Log.d( TAG, "SendMessageToDepartment: sending to token: "+ token );
             Data data = new Data();
             data.setTitle( title );
             data.setMessage( message );
             data.setData_type( getString( R.string.data_type_admin_broadcast ) );
             FirebaseCloudMessage firebaseCloudMessage = new FirebaseCloudMessage();
             firebaseCloudMessage.setData(data);
-            //firebaseCloudMessage.setTo(token);
-            firebaseCloudMessage.setTo( "/topics/Computer_Science" );
+            firebaseCloudMessage.setTo(token);
+            //firebaseCloudMessage.setTo( "/topics/Chemical_Engineering" );
 
             Call<ResponseBody> call = fcmAPI.send( headers, firebaseCloudMessage );
 
@@ -309,6 +310,9 @@ public class AdminActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     Log.d(TAG, "onResponse Server response: "+ response.toString() );
+                    Intent intent = getIntent();
+                    finish();
+                    startActivity(intent);
                 }
 
                 @Override
@@ -317,7 +321,7 @@ public class AdminActivity extends AppCompatActivity {
                     Toast.makeText( AdminActivity.this, "Unable to send the message!!!", Toast.LENGTH_LONG ).show();
                 }
             } );
- //       }
+        }
     }
 
 

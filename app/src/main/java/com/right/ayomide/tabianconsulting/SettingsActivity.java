@@ -247,11 +247,13 @@ public class SettingsActivity extends AppCompatActivity {
                 builder.setSingleChoiceItems(adapter, index, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+
                         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
                         reference.child(getString(R.string.dbnode_users))
                                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                 .child(getString(R.string.field_department))
                                 .setValue(mDepartmentsList.get(which));
+                        //FirebaseMessaging.getInstance().subscribeToTopic( mDepartmentsList.get( which ) );
                         dialog.dismiss();
                         Toast.makeText(SettingsActivity.this, "Department Saved", Toast.LENGTH_SHORT).show();
                         getAccountsData();

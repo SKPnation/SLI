@@ -24,6 +24,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.right.ayomide.tabianconsulting.Common.Common;
 import com.right.ayomide.tabianconsulting.models.User;
 import com.squareup.picasso.Picasso;
 
@@ -52,10 +53,11 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initFCM(){
-        //String token = FirebaseInstanceId.getInstance().getToken();
-        //Log.d( TAG, "initFCM: token: " + token );
-        //SendRegistrationToServer( token );
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Log.d( TAG, "initFCM: token: " + token );
+        SendRegistrationToServer( token );
 
+        /*
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
 
         Query query = reference.child( getString( R.string.dbnode_users ) )
@@ -85,6 +87,7 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         } );
+        */
 
     }
 
@@ -234,7 +237,13 @@ public class HomeActivity extends AppCompatActivity {
             finish();
         }
         if(item.getItemId() == R.id.action_settings){
-            startActivity( new Intent( this, SettingsActivity.class ) );
+            if (Common.isConnectedToTheInternet( getBaseContext() ))
+            {
+                startActivity( new Intent( this, SettingsActivity.class ) );
+            }
+            else
+                Toast.makeText(getBaseContext(), "Please check your internet connection", Toast.LENGTH_SHORT).show();
+
         }
         if (item.getItemId() == R.id.option_chat){
             startActivity( new Intent( this, ChatActivity.class ) );
