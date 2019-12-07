@@ -113,7 +113,6 @@ public class AdminActivity extends AppCompatActivity {
 
         mDepartmentsList = new ArrayList<>();
 
-        //setupEmployeeList();
         init();
 
 

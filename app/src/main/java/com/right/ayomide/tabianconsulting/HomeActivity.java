@@ -25,6 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.right.ayomide.tabianconsulting.Common.Common;
+import com.right.ayomide.tabianconsulting.models.Chatroom;
 import com.right.ayomide.tabianconsulting.models.User;
 import com.squareup.picasso.Picasso;
 
@@ -48,8 +49,25 @@ public class HomeActivity extends AppCompatActivity {
         setupFirebaseAuth();
         getUserDetails();
         initFCM();
+        getPendingIntent();
 
         //setUserDetails();
+    }
+
+    private void getPendingIntent(){
+        Log.d(TAG, "getPendingIntent: checking for pending intents.");
+
+        Intent intent = getIntent();
+        if(intent.hasExtra(getString(R.string.intent_chatroom))){
+            Log.d(TAG, "getPendingIntent: pending intent detected.");
+
+            //get the chatroom
+            Chatroom chatroom = intent.getParcelableExtra(getString(R.string.intent_chatroom));
+            //navigate to the chatoom
+            Intent chatroomIntent = new Intent(HomeActivity.this, ChatroomActivity.class);
+            chatroomIntent.putExtra(getString(R.string.intent_chatroom), chatroom);
+            startActivity(chatroomIntent);
+        }
     }
 
     private void initFCM(){

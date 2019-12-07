@@ -46,13 +46,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import com.right.ayomide.tabianconsulting.models.fcm.Data;
+import com.right.ayomide.tabianconsulting.models.fcm.FirebaseCloudMessage;
 import com.right.ayomide.tabianconsulting.utility.ChatMessageListAdapter;
+import com.right.ayomide.tabianconsulting.utility.FCM;
 
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class ChatroomActivity extends AppCompatActivity {
 
     private static final String TAG = "ChatroomActivity";
+    private static final String BASE_URL = "https://fcm.googleapis.com/fcm/";
 
     //firebase
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -69,6 +79,8 @@ public class ChatroomActivity extends AppCompatActivity {
     private List<ChatMessage> mMessagesList;
     private Set<String> mMessageIdSet;
     private ChatMessageListAdapter mAdapter;
+    private Set<String> mTokens;
+    private String mServerKey;
     public static boolean isActivityRunning;
 
 
@@ -90,6 +102,8 @@ public class ChatroomActivity extends AppCompatActivity {
     }
 
     private void init(){
+
+        mTokens = new HashSet<>();
 
         mMessage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,8 +143,41 @@ public class ChatroomActivity extends AppCompatActivity {
                     //clear the EditText
                     mMessage.setText("");
 
+
                     //refresh the messages list? Or is it done by the listener??
                 }
+
+            }
+        });
+
+        getServerKey();
+    }
+
+    /**
+     * Get all the tokens of the users who are in this chatroom
+     */
+
+
+    /**
+     * Retrieves the server key for the Firebase server.
+     * This is required to send FCM messages.
+     */
+    private void getServerKey()
+    {
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+        Query query = reference.child(getString(R.string.dbnode_server))
+                .orderByValue();
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange: got the server key.");
+                DataSnapshot singleSnapshot = dataSnapshot.getChildren().iterator().next();
+                mServerKey = singleSnapshot.getValue().toString();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
